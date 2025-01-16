@@ -7,8 +7,7 @@
 // Memory allocation flags
 #define SECURE_MEM_ZERO_INIT 0x01 // Zero initialize memory
 #define SECURE_MEM_LOCK 0x02      // Lock memory in RAM (prevent swapping)
-#define SECURE_MEM_NO_DUMP                                                     \
-  0x04 // Prevent memory from being included in core dumps
+#define SECURE_MEM_NO_DUMP 0x04 // Prevent memory from being included in core dumps
 
 // Secure memory structure with canaries and size information
 typedef struct {
