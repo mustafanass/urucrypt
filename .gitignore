@@ -1,0 +1,65 @@
+# Build artifacts
+obj/
+bin/
+*.o
+*.d
+
+# Executable
+urucrypt
+urucrypt.exe
+
+# Log files
+urucrypt.log
+*.log
+
+# Test files and encrypted outputs
+*.enc
+*.bin
+test_*
+*.dec
+
+# Editor and IDE files
+.vscode/
+.idea/
+*.swp
+*~
+
+# Build system files
+.deps/
+.libs/
+Makefile.in
+aclocal.m4
+autom4te.cache/
+config.status
+config.log
+
+# Debug files
+*.dSYM/
+*.su
+*.idb
+*.pdb
+
+# Dependency files
+*.d
+
+# System-specific files
+.DS_Store
+Thumbs.db
+
+# OpenSSL generated files
+*.pem
+*.key
+*.crt
+
+# Temporary files
+*.tmp
+*.bak
+*.backup
+
+# Documentation generated files
+docs/_build/
+doxygen/
+
+# Core dumps
+core
+core.*
