@@ -202,7 +202,7 @@ The logging system provides three levels of detail:
 - **1 (WARN)**: Warnings and errors
 - **2 (INFO)**: Full information (default)
 
-Logs are written to `urucrypt_encryption.log` in the current directory.
+Logs are written to `urucrypt.log` in the current directory.
 
 ## Error Codes
 
