@@ -27,4 +27,4 @@ void derive_key(const char *passphrase, CryptoParams *params);
 int verify_passphrase(const char *passphrase, const CryptoParams *params);
 void secure_erase(void *ptr, size_t size);
 
-#endif /* KEY_MANAGEMENT_H */
+#endif
