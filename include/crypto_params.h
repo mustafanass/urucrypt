@@ -38,4 +38,4 @@ typedef struct CryptoParams {
     unsigned char pass_hash[PASS_HASH_SIZE];
 } CryptoParams;
 
-#endif /* CRYPTO_PARAMS_H */
+#endif 
