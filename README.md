@@ -99,7 +99,6 @@ urucrypt/
 │   └── utils.c
 └── main.c
 ```
-
 ## Technology Choices
 
 1. **OpenSSL**
@@ -119,6 +118,13 @@ urucrypt/
    - Memory-efficient processing
    - Progress tracking capability
    - Resumable operations
+
+4. **Argon2 (new update)**
+   - Modern, memory-hard key derivation function
+   - Configurable parameters for time, memory, and parallelism
+   - Robust protection against GPU/ASIC-based attacks
+   - Provides both key derivation and verification capabilities
+
 
 ## Build and Installation
 
