@@ -20,8 +20,9 @@
 #include "../include/error_handling.h"
 #include "../include/logging.h"
 #include "../include/secure_memory.h"
+#include "../include/crypto_params.h"
+#include <argon2.h>
 #include <openssl/crypto.h>
-#include <openssl/evp.h>
 #include <openssl/rand.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -63,7 +64,8 @@ void generate_random_bytes(unsigned char *buffer, size_t size) {
     secure_free(secure_buffer);
 }
 
-// Derives encryption key and verification hash from passphrase using PBKDF2
+
+// Derives encryption key and verification hash from passphrase using Argon2.
 void derive_key(const char *passphrase, CryptoParams *params) {
     // Validate input parameters
     if (!passphrase || !params) {
@@ -100,27 +102,51 @@ void derive_key(const char *passphrase, CryptoParams *params) {
     secure_memcpy(secure_pass, pass_len + 1, passphrase, pass_len);
     ((char *)secure_pass)[pass_len] = '\0';
 
-    // Generate encryption key using PBKDF2
-    if (!PKCS5_PBKDF2_HMAC(secure_pass, pass_len, params->salt, SALT_SIZE,
-                           KDF_ITERATIONS, EVP_sha256(), KEY_SIZE, temp_key)) {
-        set_error(ERROR_CRYPTO, "Failed to derive key");
-        log_error("Critical: Key derivation operation failed");
-        goto cleanup;
+    // Generate encryption key using Argon2
+    {
+        int ret = argon2_hash(
+            ARGON2_T_COST,
+            ARGON2_M_COST,
+            ARGON2_PARALLELISM,
+            secure_pass, pass_len,
+            params->salt, SALT_SIZE,
+            temp_key, KEY_SIZE,
+            NULL, 0,
+            Argon2_id, ARGON2_VERSION_13
+        );
+
+        if (ret != ARGON2_OK) {
+            set_error(ERROR_CRYPTO, "Failed to derive key using Argon2");
+            log_error(argon2_error_message(ret));
+            goto cleanup;
+        }
     }
 
-    // Generate verification hash using PBKDF2
-    if (!PKCS5_PBKDF2_HMAC(secure_pass, pass_len, params->salt, SALT_SIZE,
-                           KDF_ITERATIONS, EVP_sha256(), PASS_HASH_SIZE,
-                           temp_hash)) {
-        set_error(ERROR_CRYPTO, "Failed to generate password verification hash");
-        log_error("Critical: Verification hash generation failed");
-        goto cleanup;
+     // Generate verification hash using Argon2
+    {
+        int ret = argon2_hash(
+            ARGON2_T_COST,
+            ARGON2_M_COST,
+            ARGON2_PARALLELISM,
+            secure_pass, pass_len,
+            params->salt, SALT_SIZE,
+            temp_hash, PASS_HASH_SIZE,
+            NULL, 0,
+            Argon2_id, ARGON2_VERSION_13
+        );
+
+        if (ret != ARGON2_OK) {
+            set_error(ERROR_CRYPTO, "Failed to generate password verification hash using Argon2");
+            log_error(argon2_error_message(ret));
+            goto cleanup;
+        }
     }
 
-    // Store results and verify they were copied correctly
+    // Store results in CryptoParams
     memcpy(params->key, temp_key, KEY_SIZE);
     memcpy(params->pass_hash, temp_hash, PASS_HASH_SIZE);
 
+    // Verify they were copied correctly
     if (memcmp(params->key, temp_key, KEY_SIZE) != 0 ||
         memcmp(params->pass_hash, temp_hash, PASS_HASH_SIZE) != 0) {
         log_error("Critical: Key/hash storage verification failed");
@@ -143,7 +169,7 @@ cleanup:
     }
 }
 
-// Verifies password against stored hash using constant-time comparison
+// Verifies password against stored hash using constant-time comparison.
 int verify_passphrase(const char *passphrase, const CryptoParams *params) {
     // Validate input parameters
     if (!passphrase || !params) {
@@ -177,17 +203,29 @@ int verify_passphrase(const char *passphrase, const CryptoParams *params) {
     secure_memcpy(secure_pass, pass_len + 1, passphrase, pass_len);
     ((char *)secure_pass)[pass_len] = '\0';
 
-    // Generate verification hash
-    if (!PKCS5_PBKDF2_HMAC(secure_pass, pass_len, params->salt, SALT_SIZE,
-                           KDF_ITERATIONS, EVP_sha256(), PASS_HASH_SIZE,
-                           test_hash)) {
-        set_error(ERROR_CRYPTO, "Failed to generate verification hash");
-        log_error("Critical: Password verification hash generation failed");
-        goto cleanup;
+    // Generate verification hash using Argon2
+    {
+        int ret = argon2_hash(
+            ARGON2_T_COST,
+            ARGON2_M_COST,
+            ARGON2_PARALLELISM,
+            secure_pass, pass_len,
+            params->salt, SALT_SIZE,
+            test_hash, PASS_HASH_SIZE,
+            NULL, 0,
+            Argon2_id, ARGON2_VERSION_13
+        );
+
+        if (ret != ARGON2_OK) {
+            set_error(ERROR_CRYPTO, "Failed to generate verification hash using Argon2");
+            log_error("Critical: Password verification hash generation failed");
+            log_error(argon2_error_message(ret));
+            goto cleanup;
+        }
     }
 
     // Constant-time comparison of hashes
-    result = CRYPTO_memcmp(test_hash, params->pass_hash, PASS_HASH_SIZE) == 0;
+    result = (CRYPTO_memcmp(test_hash, params->pass_hash, PASS_HASH_SIZE) == 0);
 
 cleanup:
     // Securely erase and free temporary buffers
@@ -207,7 +245,9 @@ cleanup:
     return result;
 }
 
-// Securely erases memory using OpenSSL's secure memory cleansing function
+/**
+ * Securely erases memory using OpenSSL's secure memory cleansing function.
+ */
 void secure_erase(void *ptr, size_t size) {
     if (ptr) {
         OPENSSL_cleanse(ptr, size);
