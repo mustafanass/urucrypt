@@ -6,7 +6,7 @@ UruCrypt is a secure file encryption and decryption tool designed with strong se
 
 - AES-256-GCM encryption for strong security and authentication
 - Secure memory handling for sensitive data
-- Password-based key derivation using PBKDF2
+- Password-based key derivation using Argon2 (new update)
 - Progress tracking during operations
 - Configurable logging system
 - Protection against timing attacks
