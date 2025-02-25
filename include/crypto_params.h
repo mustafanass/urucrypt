@@ -28,14 +28,18 @@
 #define PASS_HASH_SIZE 32
 #define CHUNK_SIZE 4096
 #define MAX_PASSPHRASE_SIZE 256
-#define KDF_ITERATIONS 100000
+
+/* Argon2 parameters */
+#define ARGON2_T_COST 2
+#define ARGON2_M_COST (1 << 16)
+#define ARGON2_PARALLELISM 1
 
 /* Structure to hold encryption parameters */
 typedef struct CryptoParams {
-    unsigned char salt[SALT_SIZE];
-    unsigned char iv[IV_SIZE];
-    unsigned char key[KEY_SIZE];
-    unsigned char pass_hash[PASS_HASH_SIZE];
+  unsigned char salt[SALT_SIZE];
+  unsigned char iv[IV_SIZE];
+  unsigned char key[KEY_SIZE];
+  unsigned char pass_hash[PASS_HASH_SIZE];
 } CryptoParams;
 
-#endif 
+#endif
