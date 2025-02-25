@@ -60,10 +60,11 @@ UruCrypt is a secure file encryption and decryption tool designed with strong se
   - Secure against padding oracle attacks
 
 #### Key Derivation
-- **PBKDF2 with SHA-256**
-  - 100,000 iterations for brute-force resistance
-  - Unique salt for each encryption
-  - Separate verification hash generation
+- **Argon2id**
+   - Memory-hard algorithm for robust protection against GPU-based attacks
+   - Configurable parameters for time, memory, and parallelism
+   - Unique salt for each encryption
+   - Provides both key derivation and verification capabilities
 
 #### Memory Protection
 - Secure memory allocation with:
