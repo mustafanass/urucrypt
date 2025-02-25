@@ -1,0 +1,8 @@
+compile = "make"
+modules = ["c-clang14"]
+
+[deployment]
+build = ["sh", "-c", "make"]
+
+[nix]
+channel = "stable-24_05"
