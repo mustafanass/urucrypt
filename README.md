@@ -60,7 +60,7 @@ UruCrypt is a secure file encryption and decryption tool designed with strong se
   - Secure against padding oracle attacks
 
 #### Key Derivation
-- **Argon2id**
+- **Argon2 (new update from PBKDF2)**
    - Memory-hard algorithm for robust protection against GPU-based attacks
    - Configurable parameters for time, memory, and parallelism
    - Unique salt for each encryption
@@ -141,6 +141,7 @@ sudo make install
 
 ### Dependencies
 - OpenSSL development libraries
+- Argon2 development libraries
 - C compiler (GCC or Clang)
 - Make build system
 
