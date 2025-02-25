@@ -23,7 +23,7 @@ UruCrypt is a secure file encryption and decryption tool designed with strong se
    - Manages cryptographic parameters (salt, IV, authentication tags)
 
 2. **Key Management (`key_management.c`)**
-   - Handles secure key derivation using PBKDF2
+   - Handles secure key derivation using Argon2 (new update)
    - Manages password verification
    - Generates cryptographic random numbers
    - Implements secure key storage
